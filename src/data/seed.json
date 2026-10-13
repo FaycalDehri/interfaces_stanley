@@ -1,0 +1,78 @@
+{
+  "_note": "JEU D'ESSAI SIMULÉ (groupe 8). Ce n'est pas le scénario réel. Heures en secondes relatives au démarrage du serveur.",
+  "exercise": {
+    "name": "STANLEY · Cyber range HETIC",
+    "scenario": "Scénario de démonstration (données simulées)",
+    "mode": "ctf",
+    "phase": "jeu",
+    "startOffsetSec": -3000,
+    "durationSec": 10800,
+    "access": { "url": null, "network": null, "support": null, "flagFormat": "STANLEY{...}" },
+    "rules": ["Un flag validé ne se partage pas entre équipes", "Ne pas attaquer l'infrastructure de la salle", "En cas de blocage, levez la main"]
+  },
+  "teams": [
+    { "id": "t1", "name": "Alpha", "members": 4 },
+    { "id": "t2", "name": "Bravo", "members": 4 },
+    { "id": "t3", "name": "Charlie", "members": 3 }
+  ],
+  "challenges": [
+    { "id": "c1", "name": "Repérage du réseau", "tactic": "TA0043", "points": 100, "status": "ouvert" },
+    { "id": "c2", "name": "Mot de passe SSH faible", "tactic": "TA0006", "points": 100, "status": "ouvert" },
+    { "id": "c3", "name": "Portail web exposé", "tactic": "TA0001", "points": 200, "status": "ouvert" },
+    { "id": "c4", "name": "Pivot vers la base", "tactic": "TA0008", "points": 200, "status": "ouvert" },
+    { "id": "c5", "name": "Root sur le serveur", "tactic": "TA0004", "points": 300, "status": "ouvert" },
+    { "id": "c6", "name": "Exfiltration DNS", "tactic": "TA0010", "points": 300, "status": "verrouille" }
+  ],
+  "solves": [
+    { "team": "t1", "challenge": "c1", "offsetSec": -2700 },
+    { "team": "t2", "challenge": "c1", "offsetSec": -2500 },
+    { "team": "t3", "challenge": "c2", "offsetSec": -2200 },
+    { "team": "t1", "challenge": "c3", "offsetSec": -1800 },
+    { "team": "t2", "challenge": "c2", "offsetSec": -1300 },
+    { "team": "t3", "challenge": "c1", "offsetSec": -900 },
+    { "team": "t1", "challenge": "c2", "offsetSec": -400 }
+  ],
+  "incidents": [
+    { "id": "i1", "team": "t1", "target": "web01", "technique": "T1110", "startOffsetSec": -2400, "detectOffsetSec": -2280 },
+    { "id": "i2", "team": "t2", "target": "web01", "technique": "T1110", "startOffsetSec": -2400, "detectOffsetSec": -1900 },
+    { "id": "i3", "team": "t1", "target": "db01", "technique": "T1021", "startOffsetSec": -1200, "detectOffsetSec": -1100 },
+    { "id": "i4", "team": "t2", "target": "db01", "technique": "T1021", "startOffsetSec": -1200, "detectOffsetSec": null },
+    { "id": "i5", "team": "t3", "target": "web01", "technique": "T1110", "startOffsetSec": -2400, "detectOffsetSec": -2000 }
+  ],
+  "chain": {
+    "steps": [
+      { "tactic": "TA0043", "label": "Reconnaissance" },
+      { "tactic": "TA0001", "label": "Accès initial" },
+      { "tactic": "TA0004", "label": "Élévation de privilèges" },
+      { "tactic": "TA0008", "label": "Mouvement latéral" },
+      { "tactic": "TA0040", "label": "Objectif atteint" }
+    ],
+    "reached": [
+      { "team": "t1", "step": 0, "offsetSec": -2600 },
+      { "team": "t1", "step": 1, "offsetSec": -1500 },
+      { "team": "t2", "step": 0, "offsetSec": -2300 },
+      { "team": "t3", "step": 0, "offsetSec": -2000 },
+      { "team": "t3", "step": 1, "offsetSec": -1200 },
+      { "team": "t3", "step": 2, "offsetSec": -300 }
+    ]
+  },
+  "alerts": [
+    { "id": "a1", "offsetSec": -2390, "severity": "haute", "title": "Brute force SSH sur WEB-01", "target": "web01", "technique": "T1110", "public": true },
+    { "id": "a2", "offsetSec": -1190, "severity": "critique", "title": "Connexion distante inhabituelle vers DB-01", "target": "db01", "technique": "T1021", "public": true }
+  ],
+  "topology": {
+    "nodes": [
+      { "id": "gw", "label": "Passerelle", "x": 50, "y": 10, "status": "sain" },
+      { "id": "fw", "label": "Pare-feu", "x": 50, "y": 32, "status": "sain" },
+      { "id": "web01", "label": "WEB-01", "x": 22, "y": 58, "status": "attaque" },
+      { "id": "db01", "label": "DB-01", "x": 50, "y": 86, "status": "compromis" },
+      { "id": "ws01", "label": "Poste 1", "x": 78, "y": 58, "status": "sain" },
+      { "id": "ws02", "label": "Poste 2", "x": 86, "y": 86, "status": "hors-ligne" }
+    ],
+    "links": [
+      { "from": "gw", "to": "fw" }, { "from": "fw", "to": "web01" }, { "from": "fw", "to": "ws01" },
+      { "from": "web01", "to": "db01" }, { "from": "ws01", "to": "ws02" }, { "from": "ws01", "to": "db01" }
+    ]
+  },
+  "sponsors": ["OPCO ATLAS"]
+}
